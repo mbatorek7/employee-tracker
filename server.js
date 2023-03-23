@@ -2,9 +2,6 @@ const consoleTable = require('console.table');
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
 
-//import functions to be used for each inquirer choice
-import { viewDepartments, viewRoles, viewEmployees, addDepartment, addEmployee, addRole, updateEmployeeRole } from "./queryFunctions";;
-
 require('dotenv').config();
 
 // Connect to database
@@ -35,9 +32,9 @@ function init() {
     }
   ])
   .then((answers) => {
-    switch(answers) {
+    switch(answers.choices) {
       case 'View all departments':
-        viewDepartments();
+        viewDepartment();
         break;
 
       case 'View all roles':
@@ -63,9 +60,143 @@ function init() {
       case 'Update an employee role':
         updateEmployeeRole();
         break;
-        
+
       case 'No Action':
-        
+        db.end();
+        break;
     }
   })
 }
+
+function viewDepartment() {
+  const query = `SELECT id, name AS department FROM department;`;
+
+  db.promise().query(query)
+  .then(([rows]) => {
+      console.table(rows)
+      init();
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+}
+
+
+//view all roles
+function viewRoles() {
+  const query = `SELECT roles.id, 
+                 roles.title,
+                 department.name AS department,
+                 roles.salary
+                 FROM roles
+                 JOIN department 
+                 ON roles.department_id = department.id;`;
+  db.promise().query(query)
+  .then(([rows]) => {
+      console.table(rows)
+      init();
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+}
+
+//view all employees
+function viewEmployees() {
+  const query = `SELECT employee.id, 
+                 employee.first_name, 
+                 employee.last_name,
+                 roles.title,
+                 department.name AS department,
+                 roles.salary,
+                 employee.manager_id 
+                 FROM employee
+                 LEFT JOIN roles ON employee.role_id = roles.id
+                 LEFT JOIN department ON roles.department_id = department.id;`;
+  
+   db.promise().query(query)
+  .then(([rows]) => {
+      console.table(rows)
+      init();
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+}
+
+//add a department
+function addDepartment() {
+  inquirer.prompt([
+    {
+      type: 'input', 
+      name: 'addDepartment',
+      message: "What department do you want to add?"
+    }
+  ]) 
+  .then((answer) => {
+    const query = `INSERT INTO department (name) VALUES (?);`;
+    db.query(query, answer.addDepartment, (err, result) => {
+      if (err) throw err;
+      console.log('Added ' + answer.addDepartment + " to departments!"); 
+
+      viewDepartment();
+    });
+  });
+}
+
+//add a role
+function addRole() {
+  inquirer.prompt([
+    {
+      type: 'input', 
+      name: 'addRole',
+      message: "What role do you want to add?"
+    },
+    {
+      type: 'input', 
+      name: 'addSalary',
+      message: "What is the salary for this new role?"
+    }
+  ]) 
+  .then((answer) => {
+    const query = `INSERT INTO roles (title, salary) VALUES (?);`;
+    
+  })
+}
+
+//add an employee
+function addEmployee() {
+  inquirer.prompt([
+    {
+      type: 'input', 
+      name: 'employeeFirst',
+      message: "What is the first name of the employee?"
+    },
+    {
+      type: 'input', 
+      name: 'employeeLast',
+      message: "What is the last name of the employee?"
+    }
+  ]) 
+  .then((answer) => {
+    const query = `INSERT INTO employee (first_name, last_name) VALUES (?);`;
+
+  })
+}
+
+//update employee role
+function updateEmployeeRole() {
+  inquirer.prompt([
+    {
+      type: 'input', 
+      name: 'employeeFirst',
+      message: "What is the first name of the employee?"
+    }
+  ]) 
+  .then((answer) => {
+    const query = ``;
+
+  })
+}
+
+init();

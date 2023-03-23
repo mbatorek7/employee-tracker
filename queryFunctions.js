@@ -1,9 +1,6 @@
 //view all departments
-function viewDepartments() {
-  const query = `SELECT department.id AS id, 
-                 department.name AS department 
-                 FROM department`;
-}
+const viewDepartment = `SELECT *
+                        FROM department;`;
 
 //view all roles
 function viewRoles() {
@@ -13,7 +10,7 @@ function viewRoles() {
                  roles.salary AS salary 
                  FROM roles
                  INNER JOIN department 
-                 ON role.department_id = department.id`;
+                 ON role.department_id = department.id;`;
 }
 
 //view all employees
@@ -27,7 +24,7 @@ function viewEmployees() {
                  employee.manager_id 
                  FROM employee
                  LEFT JOIN roles ON employee.role_id = roles.id
-                 LEFT JOIN department ON roles.department_id = department.id`;
+                 LEFT JOIN department ON roles.department_id = department.id;`;
 }
 
 //add a department
@@ -91,4 +88,4 @@ function updateEmployeeRole() {
 }
 
 //export all functions to be used in server.js
-export {viewDepartments, viewRoles, viewEmployees, addDepartment, addEmployee, addRole, updateEmployeeRole};
+module.exports = {viewDepartment, viewRoles, viewEmployees, addDepartment, addEmployee, addRole, updateEmployeeRole};

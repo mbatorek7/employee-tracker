@@ -175,7 +175,6 @@ function addRole() {
       if(err) {
         throw err;
       } else {
-        console.log(data[0].id)
         values.push(data[0].id)
         db.query(query, values, (err, result) => {
           if (err) throw err;
@@ -190,7 +189,7 @@ function addRole() {
 
 function setValue(data) {
   value = data;
-  console.log(value);
+  //console.log(value);
 }
 
 //add an employee
@@ -208,8 +207,8 @@ function addEmployee() {
     }
   ]) 
   .then((answer) => {
-    const query = `INSERT INTO employee (first_name, last_name) VALUES (?);`;
-    const values = [[answer.employeeFirst, answer.employeeLast]];
+    const query = `INSERT INTO employee (first_name, last_name) VALUES (?, ?);`;
+    const values = [answer.employeeFirst, answer.employeeLast];
 
     db.query(query, values, (err, result) => {
       if (err) throw err;

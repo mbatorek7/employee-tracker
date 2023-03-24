@@ -28,7 +28,7 @@ THEN I am prompted to select an employee to update and their new role and this i
 ```
 
 ## Description
-
+This database allows the users to view all departments, roles, and employees. The user also has the option to add a department, role, or employee. The user can also update an employee's role or manager. One flaw with this application is that there is a glitch when inquirer is asking the user to add a new role. The question will be asked twice, but also this data is inserted into the tables twice.
 
 <p align="center">
     <a href="https://github.com/mbatorek7/hw12-employee-tracker"><img src="https://img.shields.io/badge/-See Live Site-success?style=for-the-badge"  alt="GitHub Repo" ></a>

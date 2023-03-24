@@ -1,7 +1,6 @@
 const consoleTable = require('console.table'); 
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
-var value = [];
 
 require('dotenv').config();
 
@@ -187,11 +186,6 @@ function addRole() {
   })
 }
 
-function setValue(data) {
-  value = data;
-  //console.log(value);
-}
-
 //add an employee
 function addEmployee() {
   inquirer.prompt([
@@ -250,14 +244,14 @@ function updateEmployee() {
       case 'Role':
         db.query(queryRole, [answer.updateColumnID ,answer.employeeID], (err, data) => {
           console.log("Updated employee role");
-          init();
         })
+        init();
         break;
       case 'Manager':
         db.query(queryManager, [answer.updateColumnID ,answer.employeeID], (err, data) => {
           console.log("Updated employee manager");
-          init();
         })
+        init();
         break;
     }     
   })

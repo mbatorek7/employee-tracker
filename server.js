@@ -1,6 +1,7 @@
 const consoleTable = require('console.table'); 
 const inquirer = require('inquirer');
 const mysql = require('mysql2');
+var value = [];
 
 require('dotenv').config();
 
@@ -27,7 +28,7 @@ function init() {
                 'Add a department', 
                 'Add a role', 
                 'Add an employee', 
-                'Update an employee role',
+                'Update an employee',
                 'No Action']
     }
   ])
@@ -53,12 +54,12 @@ function init() {
         addRole();
         break;
 
-      case 'Add am employee':
+      case 'Add an employee':
         addEmployee();
         break;
         
-      case 'Update an employee role':
-        updateEmployeeRole();
+      case 'Update an employee':
+        updateEmployee();
         break;
 
       case 'No Action':
@@ -137,9 +138,10 @@ function addDepartment() {
     const query = `INSERT INTO department (name) VALUES (?);`;
     db.query(query, answer.addDepartment, (err, result) => {
       if (err) throw err;
-      console.log('Added ' + answer.addDepartment + " to departments!"); 
+      console.log(`Added ${answer.addDepartment} to departments!`); 
 
       viewDepartment();
+      init();
     });
   });
 }
@@ -149,19 +151,46 @@ function addRole() {
   inquirer.prompt([
     {
       type: 'input', 
-      name: 'addRole',
+      name: 'role',
       message: "What role do you want to add?"
     },
     {
       type: 'input', 
-      name: 'addSalary',
+      name: 'salary',
       message: "What is the salary for this new role?"
+    }, 
+    {
+      type: 'input', 
+      name: 'dept',
+      message: "What is the department for this new role?"
     }
   ]) 
   .then((answer) => {
-    const query = `INSERT INTO roles (title, salary) VALUES (?);`;
-    
+    const getDept = `SELECT id FROM department WHERE name = (?);`;
+
+    const query = `INSERT INTO roles (title, salary, department_id) VALUES (?,?,?);`;
+    const values = [answer.role, answer.salary];
+
+    db.query(getDept, answer.dept, (err, data) => {
+      if(err) {
+        throw err;
+      } else {
+        console.log(data[0].id)
+        values.push(data[0].id)
+        db.query(query, values, (err, result) => {
+          if (err) throw err;
+          console.log(`Added ${answer.role} to roles!`); 
+        });
+      }
+    });
+
+    init();
   })
+}
+
+function setValue(data) {
+  value = data;
+  console.log(value);
 }
 
 //add an employee
@@ -180,22 +209,58 @@ function addEmployee() {
   ]) 
   .then((answer) => {
     const query = `INSERT INTO employee (first_name, last_name) VALUES (?);`;
+    const values = [[answer.employeeFirst, answer.employeeLast]];
 
+    db.query(query, values, (err, result) => {
+      if (err) throw err;
+      console.log(`Added ${answer.employeeFirst} ${answer.employeeLast} to employee!`); 
+    });
+
+    init();
   })
 }
 
 //update employee role
-function updateEmployeeRole() {
+function updateEmployee() {
   inquirer.prompt([
     {
       type: 'input', 
-      name: 'employeeFirst',
-      message: "What is the first name of the employee?"
-    }
+      name: 'employeeID',
+      message: "What is the ID of the employee?"
+    },
+    {
+      type: 'list', 
+      name: 'update',
+      message: "Do you want to update a manager or role?",
+      choices: ['Role', 'Manager']
+    },
+    {
+      type: 'input', 
+      name: 'updateColumnID',
+      message: "Please enter new id for this column:",
+    },
   ]) 
   .then((answer) => {
-    const query = ``;
-
+    const queryManager = `UPDATE employee
+                   SET manager_id = ?
+                   WHERE id = (?);`;
+    const queryRole = `UPDATE employee
+                   SET role_id = ?
+                   WHERE id = (?);`;
+    switch(answer.update) {
+      case 'Role':
+        db.query(queryRole, [answer.updateColumnID ,answer.employeeID], (err, data) => {
+          console.log("Updated employee role");
+          init();
+        })
+        break;
+      case 'Manager':
+        db.query(queryManager, [answer.updateColumnID ,answer.employeeID], (err, data) => {
+          console.log("Updated employee manager");
+          init();
+        })
+        break;
+    }     
   })
 }
 

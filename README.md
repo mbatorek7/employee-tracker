@@ -37,7 +37,7 @@ This database allows the users to view all departments, roles, and employees. Th
 ## Screenshots
 
 Here is what the final product looks like and how to use it:
-
+![Final product.](./assets/images/final-product.gif)
 
 ## Installation
 To clone this repo:
